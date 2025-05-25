@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+            scroll-snap-type: y mandatory;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+        }
+
+        .gradient-section {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: start;
+            position: relative;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .color-info {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 40px 50px;
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            box-shadow: 0 16px 64px rgba(0, 0, 0, 0.15);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gradient-title {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        .color-codes {
+            display: flex;
+            gap: 24px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .color-code {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px 20px;
+            border-radius: 32px;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-code::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .color-code:hover {
+            background: rgba(0, 0, 0, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-code:hover::before {
+            left: 100%;
+        }
+
+        .color-code:active {
+            transform: translateY(0);
+        }
+
+        .navigation {
+            position: fixed;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            max-height: 75vh;
+            overflow-y: auto;
+            gap: 6px;
+            padding: 20px 12px;
+            border-radius: 20px;
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
+        }
+
+        .navigation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 20px;
+            pointer-events: none;
+        }
+
+        .navigation::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .navigation::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .navigation::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .navigation::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid black;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-dot::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            border-radius: 50% 0 0 50%;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            border-radius: 0 50% 50% 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            transform: scale(1.4);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .nav-dot:hover {
+            transform: scale(1.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-counter {
+            position: absolute;
+            top: 32px;
+            left: 32px;
+            color: white;
+            font-size: 16px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px 24px;
+            border-radius: 32px;
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 500;
+            transform: translateX(-20px);
+            opacity: 0;
+            animation: slideInLeft 0.8s ease-out 0.5s forwards;
+        }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 32px;
+            right: 32px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+            font-weight: 500;
+        }
+
+        .copy-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .navigation {
+                right: 16px;
+                padding: 16px 8px;
+                max-height: 60vh;
+            }
+            
+            .nav-dot {
+                width: 14px;
+                height: 14px;
+            }
+            
+            .color-info {
+                padding: 32px 24px;
+                margin: 0 20px;
+            }
+            
+            .color-codes {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navigation" id="navigation"></div>
+    <div class="copy-notification" id="copyNotification">Copied to clipboard!</div>
+
+    <!-- Single section that dynamically changes -->
+    <div class="gradient-section" id="gradientSection">
+        <div class="section-counter" id="sectionCounter">1 / 351</div>
+        <div class="color-info">
+            <div class="gradient-title" id="gradientTitle">Black to Navy</div>
+            <div class="color-codes">
+                <div class="color-code" id="color1">#000</div>
+                <div class="color-code" id="color2">#007</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Color array
+        const colors = [
+            '#000', '#007', '#00f', '#070', '#077', '#07f', '#0f0', '#0f7', '#0ff',
+            '#700', '#707', '#70f', '#770', '#777', '#77f', '#7f0', '#7f7', '#7ff',
+            '#f00', '#f07', '#f0f', '#f70', '#f77', '#f7f', '#ff0', '#ff7', '#fff'
+        ];
+
+        // Generate color names
+        const colorNames = {
+            '#000': 'Black', '#007': 'Navy', '#00f': 'Blue', '#070': 'Green', 
+            '#077': 'Teal', '#07f': 'Cyan', '#0f0': 'Lime', '#0f7': 'Spring',
+            '#0ff': 'Aqua', '#700': 'Maroon', '#707': 'Purple', '#70f': 'Violet',
+            '#770': 'Olive', '#777': 'Gray', '#77f': 'Slate', '#7f0': 'Chartreuse',
+            '#7f7': 'Silver', '#7ff': 'Sky', '#f00': 'Red', '#f07': 'Rose',
+            '#f0f': 'Magenta', '#f70': 'Orange', '#f77': 'Pink', '#f7f': 'Lavender',
+            '#ff0': 'Yellow', '#ff7': 'Gold', '#fff': 'White'
+        };
+
+        // Create all possible pairs
+        const pairs = [];
+        for (let i = 0; i < colors.length; i++) {
+            for (let j = i + 1; j < colors.length; j++) {
+                pairs.push([colors[i], colors[j]]);
+            }
+        }
+
+        let currentIndex = 0;
+        let isScrolling = false;
+
+        // DOM elements
+        const gradientSection = document.getElementById('gradientSection');
+        const sectionCounter = document.getElementById('sectionCounter');
+        const gradientTitle = document.getElementById('gradientTitle');
+        const color1Element = document.getElementById('color1');
+        const color2Element = document.getElementById('color2');
+        const copyNotification = document.getElementById('copyNotification');
+
+        // Update gradient display
+        function updateGradient(index) {
+            const [color1, color2] = pairs[index];
+            const name1 = colorNames[color1] || color1;
+            const name2 = colorNames[color2] || color2;
+
+            // Update background with smooth transition
+            gradientSection.style.background = `linear-gradient(45deg, ${color1}, ${color2})`;
+            
+            // Update content
+            sectionCounter.textContent = `${index + 1} / ${pairs.length}`;
+            gradientTitle.textContent = `${name1} to ${name2}`;
+            color1Element.textContent = color1.toUpperCase();
+            color2Element.textContent = color2.toUpperCase();
+        }
+
+        // Copy to clipboard with notification
+        async function copyToClipboard(text, element) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showCopyNotification(text);
+                
+                // Visual feedback
+                element.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    element.style.transform = '';
+                }, 150);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
+        }
+
+        function showCopyNotification(text) {
+            copyNotification.textContent = `Copied ${text}!`;
+            copyNotification.classList.add('show');
+            setTimeout(() => {
+                copyNotification.classList.remove('show');
+            }, 2000);
+        }
+
+        // Generate navigation dots
+        function generateNavigation() {
+            const navigation = document.getElementById('navigation');
+            
+            pairs.forEach((pair, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'nav-dot';
+                dot.title = `${pair[0]} → ${pair[1]}`;
+                
+                // Create CSS for split colors
+                const style = document.createElement('style');
+                style.textContent = `
+                    .nav-dot:nth-child(${index + 1})::before {
+                        background-color: ${pair[0]};
+                    }
+                    .nav-dot:nth-child(${index + 1})::after {
+                        background-color: ${pair[1]};
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                dot.addEventListener('click', () => {
+                    currentIndex = index;
+                    updateGradient(currentIndex);
+                    updateActiveNavigation();
+                });
+                
+                navigation.appendChild(dot);
+            });
+        }
+
+        // Update active navigation dot
+        function updateActiveNavigation() {
+            const navigation = document.getElementById('navigation');
+            
+            document.querySelectorAll('.nav-dot').forEach((dot, index) => {
+                const isActive = index === currentIndex;
+                dot.classList.toggle('active', isActive);
+                
+                // Auto-scroll navigation to keep active dot visible
+                if (isActive) {
+                    const dotOffsetTop = dot.offsetTop;
+                    const navScrollTop = navigation.scrollTop;
+                    const navHeight = navigation.clientHeight;
+                    
+                    if (dotOffsetTop < navScrollTop || dotOffsetTop > navScrollTop + navHeight - 40) {
+                        navigation.scrollTo({
+                            top: dotOffsetTop - navHeight / 2,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        }
+
+        // Keyboard navigation
+        function handleKeyboard(e) {
+            if (isScrolling) return;
+            
+            switch(e.key) {
+                case 'ArrowDown':
+                case ' ':
+                    e.preventDefault();
+                    if (currentIndex < pairs.length - 1) {
+                        isScrolling = true;
+                        currentIndex++;
+                        updateGradient(currentIndex);
+                        updateActiveNavigation();
+                        setTimeout(() => { isScrolling = false; }, 300);
+                    }
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        isScrolling = true;
+                        currentIndex--;
+                        updateGradient(currentIndex);
+                        updateActiveNavigation();
+                        setTimeout(() => { isScrolling = false; }, 300);
+                    }
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    currentIndex = 0;
+                    updateGradient(currentIndex);
+                    updateActiveNavigation();
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    currentIndex = pairs.length - 1;
+                    updateGradient(currentIndex);
+                    updateActiveNavigation();
+                    break;
+            }
+        }
+
+        // Initialize everything
+        function init() {
+            generateNavigation();
+            updateGradient(0);
+            updateActiveNavigation();
+            
+            // Event listeners
+            document.addEventListener('keydown', handleKeyboard);
+            
+            // Copy functionality
+            color1Element.addEventListener('click', () => {
+                copyToClipboard(pairs[currentIndex][0], color1Element);
+            });
+            
+            color2Element.addEventListener('click', () => {
+                copyToClipboard(pairs[currentIndex][1], color2Element);
+            });
+            
+            console.log(`Generated navigation for ${pairs.length} gradient combinations`);
+        }
+
+        // Start when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
