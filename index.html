@@ -421,6 +421,31 @@
             });
         }
 
+        // Handle scroll navigation
+        function handleScroll(e) {
+            if (isScrolling) return;
+            
+            const delta = Math.sign(e.deltaY);
+            
+            if (delta > 0 && currentIndex < pairs.length - 1) {
+                // Scroll down
+                isScrolling = true;
+                currentIndex++;
+                updateGradient(currentIndex);
+                updateActiveNavigation();
+                setTimeout(() => { isScrolling = false; }, 300);
+            } else if (delta < 0 && currentIndex > 0) {
+                // Scroll up
+                isScrolling = true;
+                currentIndex--;
+                updateGradient(currentIndex);
+                updateActiveNavigation();
+                setTimeout(() => { isScrolling = false; }, 300);
+            }
+            
+            e.preventDefault();
+        }
+
         // Keyboard navigation
         function handleKeyboard(e) {
             if (isScrolling) return;
@@ -469,6 +494,7 @@
             updateActiveNavigation();
             
             // Event listeners
+            gradientSection.addEventListener('wheel', handleScroll, { passive: false });
             document.addEventListener('keydown', handleKeyboard);
             
             // Copy functionality
